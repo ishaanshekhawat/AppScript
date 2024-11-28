@@ -1,0 +1,28 @@
+function importCSVFilesToSingleSheet() {
+  const folderId = "1tkPxwUqduSAZdT-uhXFs3wwNKkf7bzvm"; // Replace with the ID of the folder containing your CSV files
+  const folder = DriveApp.getFolderById(folderId);
+  const files = folder.getFilesByType(MimeType.CSV);
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // Get or create a sheet named "Combined Data"
+  let sheet = spreadsheet.getSheetByName("Combined Data");
+  if (!sheet) {
+    sheet = spreadsheet.insertSheet("Combined Data");
+  } else {
+    sheet.clear(); // Clear the sheet if you want fresh data each time
+  }
+  
+  let currentRow = 1; // Start appending from the first row
+
+  while (files.hasNext()) {
+    const file = files.next();
+    const csvContent = file.getBlob().getDataAsString();
+    const csvData = Utilities.parseCsv(csvContent);
+
+    // Append data to the sheet
+    sheet.getRange(currentRow, 1, csvData.length, csvData[0].length).setValues(csvData);
+    currentRow += csvData.length; // Update the current row to continue appending
+  }
+
+  SpreadsheetApp.getUi().alert("All CSV files have been combined into a single sheet successfully!");
+}
