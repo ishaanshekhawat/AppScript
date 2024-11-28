@@ -1,3 +1,5 @@
+// First you need to upload all the CSV files into a Google Drive Folder.
+
 function importCSVFilesToSingleSheet() {
   const folderId = "FOLDER ID HERE (drive.google.com/.../folders/"This Part")"; // Replace with the ID of the folder containing your CSV files
   const folder = DriveApp.getFolderById(folderId);
