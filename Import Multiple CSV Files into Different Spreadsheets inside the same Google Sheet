@@ -1,0 +1,54 @@
+function importCSVFilesToMultipleSheets() {
+  const folderId = "FOLDER ID HERE";
+  const folder = DriveApp.getFolderById(folderId);
+  const files = folder.getFilesByType(MimeType.CSV);
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // Track imported and skipped files
+  const importedFiles = [];
+  const skippedFiles = [];
+  
+  // Loop through each CSV file
+  while (files.hasNext()) {
+    const file = files.next();
+    
+    try {
+      const sheetName = file.getName().replace('.csv', '');
+      let sheet = spreadsheet.getSheetByName(sheetName);
+      if (!sheet) {
+        sheet = spreadsheet.insertSheet(sheetName);
+      } else {
+        sheet.clear();
+      }
+      
+      const csvContent = file.getBlob().getDataAsString();
+      const csvData = Utilities.parseCsv(csvContent);
+      
+      sheet.getRange(1, 1, csvData.length, csvData[0].length).setValues(csvData);
+      
+      // Track successfully imported files
+      importedFiles.push(file.getName());
+    } catch (error) {
+      // Track files that couldn't be imported
+      skippedFiles.push(file.getName());
+      Logger.log('Error importing ' + file.getName() + ': ' + error.toString());
+    }
+  }
+  
+  // Prepare summary message
+  let message = 'CSV Import Results:\n';
+  message += 'Imported Files (' + importedFiles.length + '):\n';
+  importedFiles.forEach(function(fileName) {
+    message += '- ' + fileName + '\n';
+  });
+  
+  if (skippedFiles.length > 0) {
+    message += '\nSkipped Files (' + skippedFiles.length + '):\n';
+    skippedFiles.forEach(function(fileName) {
+      message += '- ' + fileName + '\n';
+    });
+  }
+  
+  // Show import results
+  SpreadsheetApp.getUi().alert('CSV Import Complete', message, SpreadsheetApp.getUi().ButtonSet.OK);
+}
