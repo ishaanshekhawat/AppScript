@@ -1,5 +1,5 @@
 function importCSVFilesToSingleSheet() {
-  const folderId = "1tkPxwUqduSAZdT-uhXFs3wwNKkf7bzvm"; // Replace with the ID of the folder containing your CSV files
+  const folderId = "FOLDER ID HERE (drive.google.com/.../folders/"This Part")"; // Replace with the ID of the folder containing your CSV files
   const folder = DriveApp.getFolderById(folderId);
   const files = folder.getFilesByType(MimeType.CSV);
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
